@@ -1,0 +1,1041 @@
+{
+  "users": [
+    {
+      "id": "usr-admin-01",
+      "name": "Admin Supervisor",
+      "email": "admin@remodelai.com",
+      "role": "admin",
+      "emailVerified": true,
+      "status": "ACTIVE",
+      "createdAt": "2026-08-01T08:00:00.000Z",
+      "updatedAt": "2026-09-22T18:11:32.035Z",
+      "lastLoginAt": "2026-09-22T18:11:32.036Z",
+      "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&fit=crop&q=80",
+      "salt": "dae3e3124ad484d0658914ab64fdfbf4",
+      "passwordHash": "e2dfe4498b7ba6ee7613627dc5b806b5f987daacd103f3b6cc101e7741f5525b"
+    },
+    {
+      "id": "usr-default-02",
+      "name": "Alejandro Carrillo",
+      "email": "jalejandrocp29@gmail.com",
+      "role": "user",
+      "emailVerified": true,
+      "status": "ACTIVE",
+      "createdAt": "2026-08-15T09:30:00.000Z",
+      "updatedAt": "2026-09-22T18:11:32.036Z",
+      "lastLoginAt": "2026-09-22T18:11:32.036Z",
+      "avatarUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&fit=crop&q=80",
+      "salt": "fdb5c7266da4ccf9583b3363dc006fb7",
+      "passwordHash": "0e4c30f76949f30c9b663e54b9256781ca4357852b93da6ec3780d1a9fc01357"
+    }
+  ],
+  "sessions": [],
+  "projects": [
+    {
+      "id": "prj-dormitorio-nordico",
+      "name": "Remodelación Dormitorio Nórdico",
+      "description": "Habitación de 4.0m x 3.0m con cama queen, escritorio junto al ventanal y piso de madera cálida.",
+      "ownerId": "usr-default-02",
+      "ownerName": "Alejandro Carrillo",
+      "createdAt": "2026-08-20T11:00:00.000Z",
+      "updatedAt": "2026-09-22T19:29:54.030Z",
+      "status": "active",
+      "version": 7,
+      "thumbnailUrl": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=600&auto=format&fit=crop&q=80",
+      "scene": {
+        "id": "scn-dormitorio-master",
+        "projectId": "prj-dormitorio-nordico",
+        "version": 7,
+        "dimensions": {
+          "width": 4,
+          "length": 3,
+          "height": 2.6
+        },
+        "materials": {
+          "wallMaterial": "pintura",
+          "wallColor": "#f8fafc",
+          "floorMaterial": "madera",
+          "floorColor": "#b45309",
+          "ceilingColor": "#ffffff",
+          "ceilingVisible": false
+        },
+        "lightingPreset": "natural",
+        "createdAt": "2026-08-20T11:00:00.000Z",
+        "updatedAt": "2026-09-22T19:19:33.017Z",
+        "objects": [
+          {
+            "id": "obj-cama-1",
+            "sceneId": "scn-dormitorio-master",
+            "name": "Cama Queen Nórdica",
+            "category": "muebles",
+            "type": "bed",
+            "position": {
+              "x": 0.9,
+              "y": 0.45,
+              "z": 0
+            },
+            "rotation": {
+              "x": 0,
+              "y": -90,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "color": "#e2e8f0",
+            "material": "textil",
+            "visible": true
+          },
+          {
+            "id": "obj-mesita-1",
+            "sceneId": "scn-dormitorio-master",
+            "name": "Mesita de Noche Japandi",
+            "category": "muebles",
+            "type": "table",
+            "position": {
+              "x": 0.9,
+              "y": 0.28,
+              "z": 1.3
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "color": "#d97706",
+            "material": "madera",
+            "visible": true
+          },
+          {
+            "id": "obj-lampara-1",
+            "sceneId": "scn-dormitorio-master",
+            "name": "Lámpara de Noche",
+            "category": "decoracion",
+            "type": "lamp",
+            "position": {
+              "x": 0.9,
+              "y": 0.65,
+              "z": 1.3
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "scale": {
+              "x": 0.7,
+              "y": 0.7,
+              "z": 0.7
+            },
+            "color": "#f59e0b",
+            "material": "metal_laton",
+            "visible": true
+          },
+          {
+            "id": "obj-escritorio-1",
+            "sceneId": "scn-dormitorio-master",
+            "name": "Escritorio Minimalista",
+            "category": "muebles",
+            "type": "desk",
+            "position": {
+              "x": -1.1,
+              "y": 0.38,
+              "z": 0.6
+            },
+            "rotation": {
+              "x": 0,
+              "y": 90,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "color": "#92400e",
+            "material": "madera",
+            "visible": true
+          },
+          {
+            "id": "obj-silla-1",
+            "sceneId": "scn-dormitorio-master",
+            "name": "Silla de Oficina Soft",
+            "category": "muebles",
+            "type": "chair",
+            "position": {
+              "x": -0.6,
+              "y": 0.48,
+              "z": 0.6
+            },
+            "rotation": {
+              "x": 0,
+              "y": -90,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "color": "#334155",
+            "material": "textil",
+            "visible": true
+          },
+          {
+            "id": "obj-alfombra-1",
+            "sceneId": "scn-dormitorio-master",
+            "name": "Alfombra Geométrica Bereber",
+            "category": "decoracion",
+            "type": "rug",
+            "position": {
+              "x": 0.1,
+              "y": 0.01,
+              "z": 0
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "scale": {
+              "x": 1.1,
+              "y": 1,
+              "z": 1.1
+            },
+            "color": "#f1f5f9",
+            "material": "lana",
+            "visible": true
+          },
+          {
+            "id": "obj-planta-1",
+            "sceneId": "scn-dormitorio-master",
+            "name": "Planta Monstera en Maceta",
+            "category": "decoracion",
+            "type": "plant",
+            "position": {
+              "x": -1.3,
+              "y": 0.45,
+              "z": -1
+            },
+            "rotation": {
+              "x": 0,
+              "y": 45,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "color": "#15803d",
+            "material": "organico",
+            "visible": true
+          },
+          {
+            "id": "obj-cuadro-1",
+            "sceneId": "scn-dormitorio-master",
+            "name": "Cuadro Abstracto Minimalista",
+            "category": "decoracion",
+            "type": "painting",
+            "position": {
+              "x": 1.95,
+              "y": 1.6,
+              "z": 0
+            },
+            "rotation": {
+              "x": 0,
+              "y": -90,
+              "z": 0
+            },
+            "scale": {
+              "x": 1.2,
+              "y": 1.2,
+              "z": 1
+            },
+            "color": "#6366f1",
+            "material": "lienzo",
+            "visible": true
+          },
+          {
+            "id": "obj-ventana-1",
+            "sceneId": "scn-dormitorio-master",
+            "name": "Ventana Panorámica",
+            "category": "estructura",
+            "type": "window",
+            "position": {
+              "x": -1.95,
+              "y": 1.5,
+              "z": 0.5
+            },
+            "rotation": {
+              "x": 0,
+              "y": 90,
+              "z": 0
+            },
+            "scale": {
+              "x": 1.2,
+              "y": 1,
+              "z": 1
+            },
+            "color": "#0284c7",
+            "material": "cristal_aluminio",
+            "visible": true
+          },
+          {
+            "id": "obj-puerta-1",
+            "sceneId": "scn-dormitorio-master",
+            "name": "Puerta Principal de Paso",
+            "category": "estructura",
+            "type": "door",
+            "position": {
+              "x": 0,
+              "y": 1.05,
+              "z": -1.45
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "color": "#78350f",
+            "material": "madera",
+            "visible": true
+          }
+        ]
+      },
+      "deletedAt": null
+    },
+    {
+      "id": "prj-1790104856737",
+      "name": "Nuevo Espacio 3D",
+      "description": "Proyecto de remodelación 3D",
+      "ownerId": "usr-default-02",
+      "ownerName": "Alejandro Carrillo",
+      "createdAt": "2026-09-22T19:20:56.737Z",
+      "updatedAt": "2026-09-22T19:20:56.782Z",
+      "status": "active",
+      "version": 1,
+      "scene": {
+        "id": "scn-1790104856737",
+        "projectId": "prj-1790104856737",
+        "version": 1,
+        "dimensions": {
+          "width": 4,
+          "length": 3,
+          "height": 2.6
+        },
+        "materials": {
+          "wallMaterial": "pintura",
+          "wallColor": "#f8fafc",
+          "floorMaterial": "madera",
+          "floorColor": "#b45309",
+          "ceilingColor": "#ffffff",
+          "ceilingVisible": false
+        },
+        "lightingPreset": "dia",
+        "createdAt": "2026-09-22T19:20:56.737Z",
+        "updatedAt": "2026-09-22T19:20:56.737Z",
+        "objects": [
+          {
+            "id": "obj-puerta-1790104856737",
+            "sceneId": "scn-1790104856737",
+            "name": "Puerta de Paso",
+            "category": "estructura",
+            "type": "door",
+            "position": {
+              "x": 0,
+              "y": 1.05,
+              "z": -1.45
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "color": "#78350f",
+            "material": "madera",
+            "visible": true
+          },
+          {
+            "id": "obj-ventana-1790104856737",
+            "sceneId": "scn-1790104856737",
+            "name": "Ventana",
+            "category": "estructura",
+            "type": "window",
+            "position": {
+              "x": -1.95,
+              "y": 1.4,
+              "z": 0
+            },
+            "rotation": {
+              "x": 0,
+              "y": 90,
+              "z": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            },
+            "color": "#0284c7",
+            "material": "cristal_aluminio",
+            "visible": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "proj-dormitorio-master-01",
+      "name": "Dormitorio Suite Principal 3D",
+      "description": "Espacio maestro optimizado con acabados cálidos en madera, ventilación natural y paleta escandinava.",
+      "ownerId": "usr-default-02",
+      "ownerName": "Alejandro Carrillo",
+      "createdAt": "2026-08-20T11:00:00.000Z",
+      "updatedAt": "2026-09-22T18:11:32.036Z",
+      "status": "active",
+      "version": 1,
+      "thumbnailUrl": "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=600&fit=crop&q=80",
+      "scene": {
+        "id": "scn-dormitorio-master-01",
+        "projectId": "proj-dormitorio-master-01",
+        "version": 1,
+        "dimensions": {
+          "width": 4.8,
+          "length": 4,
+          "height": 2.7
+        },
+        "materials": {
+          "wallMaterial": "pintura",
+          "wallColor": "#f1f5f9",
+          "floorMaterial": "madera",
+          "floorColor": "#a16207",
+          "ceilingColor": "#ffffff",
+          "ceilingVisible": false
+        },
+        "lightingPreset": "dia",
+        "createdAt": "2026-08-20T11:00:00.000Z",
+        "updatedAt": "2026-09-22T18:11:32.036Z",
+        "objects": [
+          {
+            "id": "obj-cama-king",
+            "sceneId": "scn-dormitorio-master-01",
+            "name": "Cama King Size",
+            "category": "muebles",
+            "type": "bed",
+            "position": {
+              "x": 0,
+              "y": 0.35,
+              "z": -0.6
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "scale": {
+              "x": 2,
+              "y": 0.7,
+              "z": 2.1
+            },
+            "color": "#475569",
+            "material": "tela_lino",
+            "visible": true
+          },
+          {
+            "id": "obj-mesa-noche-izq",
+            "sceneId": "scn-dormitorio-master-01",
+            "name": "Mesa de Noche Izquierda",
+            "category": "muebles",
+            "type": "nightstand",
+            "position": {
+              "x": -1.45,
+              "y": 0.25,
+              "z": -0.6
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "scale": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.45
+            },
+            "color": "#78350f",
+            "material": "madera",
+            "visible": true
+          },
+          {
+            "id": "obj-mesa-noche-der",
+            "sceneId": "scn-dormitorio-master-01",
+            "name": "Mesa de Noche Derecha",
+            "category": "muebles",
+            "type": "nightstand",
+            "position": {
+              "x": 1.45,
+              "y": 0.25,
+              "z": -0.6
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "scale": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.45
+            },
+            "color": "#78350f",
+            "material": "madera",
+            "visible": true
+          },
+          {
+            "id": "obj-lampara-techo",
+            "sceneId": "scn-dormitorio-master-01",
+            "name": "Lámpara Colgante Nórdica",
+            "category": "decoracion",
+            "type": "ceiling_lamp",
+            "position": {
+              "x": 0,
+              "y": 2.3,
+              "z": 0
+            },
+            "rotation": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "scale": {
+              "x": 0.6,
+              "y": 0.6,
+              "z": 0.6
+            },
+            "color": "#f59e0b",
+            "material": "metal_cepillado",
+            "visible": true
+          },
+          {
+            "id": "obj-planta-monstera",
+            "sceneId": "scn-dormitorio-master-01",
+            "name": "Monstera Deliciosa en Maceta",
+            "category": "decoracion",
+            "type": "plant",
+            "position": {
+              "x": 2,
+              "y": 0.45,
+              "z": 1.2
+            },
+            "rotation": {
+              "x": 0,
+              "y": 45,
+              "z": 0
+            },
+            "scale": {
+              "x": 0.7,
+              "y": 0.9,
+              "z": 0.7
+            },
+            "color": "#16a34a",
+            "material": "ceramica",
+            "visible": true
+          },
+          {
+            "id": "obj-puerta-acceso",
+            "sceneId": "scn-dormitorio-master-01",
+            "name": "Puerta Principal de Paso",
+            "category": "estructura",
+            "type": "door",
+            "position": {
+              "x": -1.2,
+              "y": 1.05,
+              "z": 1.95
+            },
+            "rotation": {
+              "x": 0,
+              "y": 180,
+              "z": 0
+            },
+            "scale": {
+              "x": 0.9,
+              "y": 2.1,
+              "z": 0.1
+            },
+            "color": "#334155",
+            "material": "madera",
+            "visible": true
+          },
+          {
+            "id": "obj-ventanal-panoramico",
+            "sceneId": "scn-dormitorio-master-01",
+            "name": "Ventanal Panorámico",
+            "category": "estructura",
+            "type": "window",
+            "position": {
+              "x": 2.35,
+              "y": 1.35,
+              "z": 0
+            },
+            "rotation": {
+              "x": 0,
+              "y": -90,
+              "z": 0
+            },
+            "scale": {
+              "x": 1.8,
+              "y": 1.4,
+              "z": 0.1
+            },
+            "color": "#0ea5e9",
+            "material": "cristal_aluminio",
+            "visible": true
+          }
+        ]
+      }
+    }
+  ],
+  "shares": [
+    {
+      "id": "shr-demo-01",
+      "projectId": "proj-dormitorio-master-01",
+      "projectName": "Dormitorio Suite Principal 3D",
+      "token": "espacio-demo-suite",
+      "tokenHash": "hash-espacio-demo-suite",
+      "createdBy": "usr-default-02",
+      "creatorName": "Alejandro Carrillo",
+      "isActive": true,
+      "accessCount": 14,
+      "createdAt": "2026-08-21T10:00:00.000Z"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "log-1790104927221-63zn",
+      "createdAt": "2026-09-22T19:22:07.221Z",
+      "userId": "usr-default-02",
+      "userName": "Usuario",
+      "userEmail": "",
+      "action": "export_render",
+      "entityType": "export",
+      "entityId": "exp-verify-2",
+      "status": "SUCCESS",
+      "metadata": {
+        "format": "JPG",
+        "resolution": "2K"
+      }
+    },
+    {
+      "id": "log-1790104893957-chqi",
+      "createdAt": "2026-09-22T19:21:33.957Z",
+      "userId": "usr-default-02",
+      "userName": "Usuario",
+      "userEmail": "",
+      "action": "export_render",
+      "entityType": "export",
+      "entityId": "exp-verify-1",
+      "status": "SUCCESS",
+      "metadata": {
+        "format": "PNG",
+        "resolution": "1080p"
+      }
+    },
+    {
+      "id": "log-1790104856784-22va",
+      "createdAt": "2026-09-22T19:20:56.784Z",
+      "userId": "usr-default-02",
+      "userName": "Alejandro Carrillo",
+      "userEmail": "",
+      "action": "project_create",
+      "entityType": "project",
+      "entityId": "prj-1790104856737",
+      "status": "SUCCESS",
+      "metadata": {
+        "name": "Nuevo Espacio 3D"
+      }
+    },
+    {
+      "id": "log-1790103457723-mn8f",
+      "createdAt": "2026-09-22T18:57:37.723Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/audit",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103457720-v02n",
+      "createdAt": "2026-09-22T18:57:37.720Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/metrics",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103457712-ozmt",
+      "createdAt": "2026-09-22T18:57:37.712Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/audit",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103457706-t2o4",
+      "createdAt": "2026-09-22T18:57:37.706Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/metrics",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103420632-p5c9",
+      "createdAt": "2026-09-22T18:57:00.632Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/audit",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103420627-3ct4",
+      "createdAt": "2026-09-22T18:57:00.627Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/metrics",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103420617-ghjy",
+      "createdAt": "2026-09-22T18:57:00.617Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/audit",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103420591-bp4w",
+      "createdAt": "2026-09-22T18:57:00.591Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/metrics",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103395639-dkhy",
+      "createdAt": "2026-09-22T18:56:35.639Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/audit",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103395633-gy2c",
+      "createdAt": "2026-09-22T18:56:35.633Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/metrics",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103395628-6ode",
+      "createdAt": "2026-09-22T18:56:35.628Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/audit",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103395624-l9sf",
+      "createdAt": "2026-09-22T18:56:35.624Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/metrics",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103372988-65ch",
+      "createdAt": "2026-09-22T18:56:12.988Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/metrics",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103372980-61ku",
+      "createdAt": "2026-09-22T18:56:12.980Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/audit",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103372976-ev30",
+      "createdAt": "2026-09-22T18:56:12.976Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/audit",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103372973-hzzv",
+      "createdAt": "2026-09-22T18:56:12.973Z",
+      "userId": "anon",
+      "userName": "Anónimo",
+      "userEmail": "",
+      "action": "error",
+      "entityType": "auth",
+      "entityId": "/api/admin/metrics",
+      "status": "FAILED",
+      "metadata": {
+        "reason": "Unauthorized admin resource attempt"
+      }
+    },
+    {
+      "id": "log-1790103267144-emai",
+      "createdAt": "2026-09-22T18:54:27.144Z",
+      "userId": "u",
+      "userName": "Usuario",
+      "userEmail": "",
+      "action": "export_render",
+      "entityType": "export",
+      "entityId": "exp-test-1",
+      "status": "SUCCESS",
+      "metadata": {
+        "format": "PNG",
+        "resolution": "1080p"
+      }
+    },
+    {
+      "id": "log-1790102876010-7tyq",
+      "createdAt": "2026-09-22T18:47:56.010Z",
+      "userId": "usr-default-02",
+      "userName": "Usuario",
+      "userEmail": "",
+      "action": "ai_generate",
+      "entityType": "generation",
+      "entityId": "gen-1790102876010",
+      "status": "SUCCESS",
+      "metadata": {
+        "model": "Architectural-Synthesis-Engine-v2",
+        "prompt": "Habitación moderna de 4.0m x 3.0m, cama doble cont"
+      }
+    },
+    {
+      "id": "log-1790102761610-r0fs",
+      "createdAt": "2026-09-22T18:46:01.610Z",
+      "userId": "usr-default-02",
+      "userName": "Usuario",
+      "userEmail": "",
+      "action": "ai_generate",
+      "entityType": "generation",
+      "entityId": "gen-1790102761609",
+      "status": "SUCCESS",
+      "metadata": {
+        "model": "Architectural-Synthesis-Engine-v2",
+        "prompt": "Habitación moderna de 4.0m x 3.0m, cama doble cont"
+      }
+    },
+    {
+      "id": "log-1790102653245-pqsf",
+      "createdAt": "2026-09-22T18:44:13.245Z",
+      "userId": "usr-default-02",
+      "userName": "Usuario",
+      "userEmail": "",
+      "action": "ai_generate",
+      "entityType": "generation",
+      "entityId": "gen-1790102653245",
+      "status": "SUCCESS",
+      "metadata": {
+        "model": "Architectural-Synthesis-Engine-v2",
+        "prompt": "Habitación moderna de 4.0m x 3.0m, cama doble cont"
+      }
+    },
+    {
+      "id": "log-1790102342192-1sff",
+      "createdAt": "2026-09-22T18:39:02.192Z",
+      "userId": "usr-default-02",
+      "userName": "Usuario",
+      "userEmail": "",
+      "action": "ai_generate",
+      "entityType": "generation",
+      "entityId": "gen-1790102342192",
+      "status": "SUCCESS",
+      "metadata": {
+        "model": "Architectural-Synthesis-Engine-v2",
+        "prompt": "dormitorio moderno"
+      }
+    },
+    {
+      "id": "log-seed-1",
+      "createdAt": "2026-08-20T11:00:00.000Z",
+      "userId": "usr-default-02",
+      "userName": "Alejandro Carrillo",
+      "userEmail": "jalejandrocp29@gmail.com",
+      "action": "project_create",
+      "entityType": "project",
+      "entityId": "proj-dormitorio-master-01",
+      "status": "SUCCESS",
+      "metadata": {
+        "name": "Dormitorio Suite Principal 3D"
+      }
+    },
+    {
+      "id": "log-seed-2",
+      "createdAt": "2026-08-21T10:00:00.000Z",
+      "userId": "usr-default-02",
+      "userName": "Alejandro Carrillo",
+      "userEmail": "jalejandrocp29@gmail.com",
+      "action": "share_create",
+      "entityType": "share",
+      "entityId": "shr-demo-01",
+      "status": "SUCCESS",
+      "metadata": {
+        "token": "espacio-demo-suite"
+      }
+    }
+  ],
+  "exports": [
+    {
+      "id": "exp-verify-2",
+      "projectId": "prj-1790104856737",
+      "userId": "usr-default-02",
+      "format": "JPG",
+      "resolution": "2K",
+      "status": "SUCCESS",
+      "fileUrl": "",
+      "cameraPreset": "perspectiva",
+      "lightingPreset": "dia",
+      "createdAt": "2026-09-22T00:00:01Z"
+    },
+    {
+      "id": "exp-verify-1",
+      "projectId": "prj-1790104856737",
+      "userId": "usr-default-02",
+      "format": "PNG",
+      "resolution": "1080p",
+      "status": "SUCCESS",
+      "fileUrl": "",
+      "cameraPreset": "perspectiva",
+      "lightingPreset": "dia",
+      "createdAt": "2026-09-22T00:00:00Z"
+    },
+    {
+      "id": "exp-test-1",
+      "projectId": "x",
+      "userId": "u",
+      "format": "PNG",
+      "resolution": "1080p",
+      "status": "SUCCESS",
+      "fileUrl": "",
+      "cameraPreset": "perspectiva",
+      "lightingPreset": "dia",
+      "createdAt": "2026-09-22T00:00:00Z"
+    }
+  ],
+  "aiGenerationsCount": 16
+}

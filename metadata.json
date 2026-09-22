@@ -1,0 +1,6 @@
+{
+  "name": "RemodelAI 3D",
+  "description": "App de Remodelación 3D asistida por IA con generación paramétrica, editor interactivo WebGL, exportaciones HD y compartición segura.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
