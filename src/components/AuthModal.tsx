@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User } from '../types';
-import { StorageService } from '../services/storage';
+import { useAuth } from '../hooks/useAuth';
 import { LogIn, UserPlus, Mail, Lock, User as UserIcon, X, Check, ArrowLeft, KeyRound } from 'lucide-react';
 
 interface AuthModalProps {
@@ -24,6 +24,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  const { login, register, verifyEmail, getUsers } = useAuth();
+
   if (!isOpen) return null;
 
   const handleRegister = (e: React.FormEvent) => {
@@ -40,7 +42,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
 
     try {
-      const { user } = StorageService.registerUser(name, email);
+      const { user } = register(name, email);
       setPendingUserId(user.id);
       setMode('verify');
       setSuccessMessage('Hemos enviado un enlace y código de verificación a tu correo.');
@@ -53,7 +55,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     e.preventDefault();
     if (!pendingUserId) return;
     try {
-      const user = StorageService.verifyEmail(pendingUserId);
+      const user = verifyEmail(pendingUserId);
       onAuthSuccess(user);
       onClose();
     } catch (err: any) {
@@ -65,12 +67,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     e.preventDefault();
     setErrorMessage(null);
     try {
-      const user = StorageService.login(email);
+      const user = login(email);
       onAuthSuccess(user);
       onClose();
     } catch (err: any) {
       if (err.message === 'EMAIL_NOT_VERIFIED') {
-        const existing = StorageService.getUsers().find(u => u.email.toLowerCase() === email.toLowerCase());
+        const existing = getUsers().find(u => u.email.toLowerCase() === email.toLowerCase());
         if (existing) {
           setPendingUserId(existing.id);
           setMode('verify');
@@ -84,12 +86,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleQuickSwitch = (targetEmail: string) => {
     try {
-      const user = StorageService.login(targetEmail);
+      const user = login(targetEmail);
       onAuthSuccess(user);
       onClose();
     } catch (err: any) {
       if (err.message === 'EMAIL_NOT_VERIFIED') {
-        const u = StorageService.getUsers().find(usr => usr.email === targetEmail);
+        const u = getUsers().find(usr => usr.email === targetEmail);
         if (u) {
           setPendingUserId(u.id);
           setMode('verify');

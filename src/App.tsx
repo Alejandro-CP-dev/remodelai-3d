@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { User, Project, Scene } from './types';
+import { Scene } from './types';
 import { StorageService } from './services/storage';
+import { useAuth } from './hooks/useAuth';
+import { useProjects } from './hooks/useProjects';
 import { Navbar } from './components/Navbar';
 import { LandingPage } from './components/LandingPage';
 import { Dashboard } from './components/Dashboard';
@@ -12,7 +14,10 @@ import { TestMatrixModal } from './components/TestMatrixModal';
 import { AIGeneratorModal } from './components/AIGeneratorModal';
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState<User | null>(() => StorageService.getCurrentUser());
+  const { currentUser, setCurrentUser, login, logout } = useAuth();
+  const { projects, setProjects, activeProjectId, setActiveProjectId, activeProject, openProject, createProject, duplicateProject, deleteProject, updateActiveProject, applyGeneratedScene } =
+    useProjects(currentUser);
+
   const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'editor' | 'admin' | 'shared'>(() => {
     // Check if URL hash has a share token
     if (window.location.hash.includes('share=')) {
@@ -28,35 +33,10 @@ export default function App() {
     return match ? match[1] : null;
   });
 
-  const [projects, setProjects] = useState<Project[]>(() => {
-    const user = StorageService.getCurrentUser();
-    return StorageService.getProjects(user?.id);
-  });
-
-  const [activeProjectId, setActiveProjectId] = useState<string | null>(() => {
-    const user = StorageService.getCurrentUser();
-    const list = StorageService.getProjects(user?.id);
-    return list.length > 0 ? list[0].id : null;
-  });
-
   const [isOnline, setIsOnline] = useState<boolean>(() => StorageService.isNetworkOnline());
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isTestMatrixOpen, setIsTestMatrixOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
-
-  // Sync projects when user changes
-  useEffect(() => {
-    if (currentUser) {
-      const userProjects = StorageService.getProjects(currentUser.id);
-      setProjects(userProjects);
-      if (userProjects.length > 0 && !userProjects.some(p => p.id === activeProjectId)) {
-        setActiveProjectId(userProjects[0].id);
-      }
-    } else {
-      setProjects([]);
-      setActiveProjectId(null);
-    }
-  }, [currentUser]);
 
   // Listen to hash changes (e.g. #share=xyz)
   useEffect(() => {
@@ -79,8 +59,8 @@ export default function App() {
     StorageService.setNetworkOnline(nextState);
   };
 
-  // User Actions
-  const handleAuthSuccess = (user: User) => {
+  // Auth Actions
+  const handleAuthSuccess = (user: NonNullable<typeof currentUser>) => {
     setCurrentUser(user);
     const userProjects = StorageService.getProjects(user.id);
     setProjects(userProjects);
@@ -91,14 +71,13 @@ export default function App() {
   };
 
   const handleLogout = () => {
-    StorageService.logout();
-    setCurrentUser(null);
+    logout();
     setCurrentView('landing');
   };
 
   const handleSwitchUser = (email: string) => {
     try {
-      const user = StorageService.login(email);
+      const user = login(email);
       handleAuthSuccess(user);
     } catch (err: any) {
       alert(`No se pudo cambiar al usuario: ${err.message}`);
@@ -107,84 +86,27 @@ export default function App() {
 
   // Project Actions
   const handleOpenProject = (projectId: string) => {
-    setActiveProjectId(projectId);
+    openProject(projectId);
     setCurrentView('editor');
   };
 
-  const handleCreateNewProject = (
-    name: string,
-    dimensions?: { width: number; length: number; height: number },
-    owner?: User | null
-  ) => {
-    // Accept an explicit owner so callers that just resolved/logged in a user
-    // (e.g. the landing page demo CTA) don't fall back to the stale `currentUser`
-    // closure value from before that login's state update is applied.
-    const effectiveOwner = owner !== undefined ? owner : currentUser;
-    const newProj = StorageService.createProject({
-      name,
-      ownerId: effectiveOwner?.id || 'anon',
-      ownerName: effectiveOwner?.name || 'Anónimo',
-      dimensions: dimensions || { width: 4.0, length: 3.0, height: 2.6 }
-    });
-    setProjects(StorageService.getProjects(effectiveOwner?.id));
-    setActiveProjectId(newProj.id);
+  const handleCreateNewProject = (name: string, dimensions?: { width: number; length: number; height: number }) => {
+    createProject(name, dimensions);
     setCurrentView('editor');
-  };
-
-  const handleDuplicateProject = (projectId: string) => {
-    const duplicated = StorageService.duplicateProject(
-      projectId,
-      currentUser?.id || 'anon',
-      currentUser?.name || 'Anónimo'
-    );
-    setProjects(StorageService.getProjects(currentUser?.id));
-    setActiveProjectId(duplicated.id);
   };
 
   const handleDeleteProject = (projectId: string) => {
-    StorageService.deleteProject(projectId, currentUser?.id || 'anon');
-    const remaining = StorageService.getProjects(currentUser?.id);
-    setProjects(remaining);
-    if (activeProjectId === projectId) {
-      setActiveProjectId(remaining.length > 0 ? remaining[0].id : null);
+    const { wasActive } = deleteProject(projectId);
+    if (wasActive) {
       setCurrentView('dashboard');
     }
   };
 
-  const handleUpdateActiveProject = (updated: Project) => {
-    setProjects(prev => prev.map(p => (p.id === updated.id ? updated : p)));
-  };
-
   const handleApplyAIGeneratedScene = (newScene: Scene) => {
-    if (activeProjectId) {
-      const activeProject = projects.find(p => p.id === activeProjectId);
-      if (activeProject) {
-        const updated = {
-          ...activeProject,
-          scene: newScene,
-          updatedAt: new Date().toISOString()
-        };
-        StorageService.saveProject(updated);
-        handleUpdateActiveProject(updated);
-        setCurrentView('editor');
-      }
-    } else {
-      // Create new project with the AI scene
-      const newProj = StorageService.createProject({
-        name: 'Habitación Generada con IA',
-        ownerId: currentUser?.id || 'anon',
-        ownerName: currentUser?.name || 'Anónimo',
-        dimensions: newScene.dimensions
-      });
-      const updated = { ...newProj, scene: newScene };
-      StorageService.saveProject(updated);
-      setProjects(StorageService.getProjects(currentUser?.id));
-      setActiveProjectId(updated.id);
+    if (applyGeneratedScene(newScene)) {
       setCurrentView('editor');
     }
   };
-
-  const activeProject = projects.find(p => p.id === activeProjectId) || projects[0] || null;
 
   return (
     <div className="w-screen h-screen flex flex-col bg-slate-950 text-slate-100 overflow-hidden font-sans">
@@ -213,8 +135,7 @@ export default function App() {
             // below hasn't been applied yet when the rest of this handler runs.
             let user = StorageService.getCurrentUser();
             if (!user) {
-              user = StorageService.login('jalejandrocp29@gmail.com');
-              setCurrentUser(user);
+              user = login('jalejandrocp29@gmail.com');
             }
             const projs = StorageService.getProjects(user.id);
             if (projs.length > 0) {
@@ -222,7 +143,8 @@ export default function App() {
               setActiveProjectId(projs[0].id);
               setCurrentView('editor');
             } else {
-              handleCreateNewProject('Dormitorio Principal Demo 3D', undefined, user);
+              createProject('Dormitorio Principal Demo 3D', undefined, user);
+              setCurrentView('editor');
             }
           }}
           onOpenRegister={() => setIsAuthOpen(true)}
@@ -237,10 +159,10 @@ export default function App() {
           onOpenProject={handleOpenProject}
           onCreateNewProject={handleCreateNewProject}
           onOpenAIGenerator={() => setIsAIGeneratorOpen(true)}
-          onDuplicateProject={handleDuplicateProject}
+          onDuplicateProject={duplicateProject}
           onDeleteProject={handleDeleteProject}
-          onShareProject={(id, name) => {
-            setActiveProjectId(id);
+          onShareProject={id => {
+            openProject(id);
             setCurrentView('editor');
           }}
         />
@@ -252,7 +174,7 @@ export default function App() {
           currentUser={currentUser}
           isOnline={isOnline}
           onToggleOnline={handleToggleOnline}
-          onUpdateProject={handleUpdateActiveProject}
+          onUpdateProject={updateActiveProject}
           onBackToDashboard={() => setCurrentView('dashboard')}
           onNavigateToShareView={token => {
             window.location.hash = `#share=${token}`;

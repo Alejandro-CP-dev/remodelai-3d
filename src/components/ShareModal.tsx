@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShareLink } from '../types';
-import { StorageService } from '../services/storage';
+import { useShareLink } from '../hooks/useShareLink';
 import { Share2, Copy, Check, ShieldAlert, Eye, X, Globe, Link as LinkIcon } from 'lucide-react';
 
 interface ShareModalProps {
@@ -22,19 +22,14 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   currentUserName,
   onNavigateToShareView
 }) => {
+  const { getOrCreateActiveShare, createShare, revokeShare } = useShareLink();
   const [activeShare, setActiveShare] = useState<ShareLink | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
-    const existing = StorageService.getShareLinks().find(s => s.projectId === projectId && s.isActive);
-    if (existing) {
-      setActiveShare(existing);
-    } else {
-      // Auto-create share link if none exists
-      const newShare = StorageService.createShareLink(projectId, projectName, currentUserId, currentUserName);
-      setActiveShare(newShare);
-    }
+    setActiveShare(getOrCreateActiveShare(projectId, projectName, currentUserId, currentUserName));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, projectId, projectName, currentUserId, currentUserName]);
 
   if (!isOpen) return null;
@@ -52,14 +47,13 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   const handleRevoke = () => {
     if (!activeShare) return;
     if (confirm('¿Estás seguro de revocar este enlace? Quienes lo tengan ya no podrán visualizar el proyecto.')) {
-      StorageService.revokeShareLink(activeShare.id);
+      revokeShare(activeShare.id);
       setActiveShare(null);
     }
   };
 
   const handleCreateNew = () => {
-    const newShare = StorageService.createShareLink(projectId, projectName, currentUserId, currentUserName);
-    setActiveShare(newShare);
+    setActiveShare(createShare(projectId, projectName, currentUserId, currentUserName));
   };
 
   return (

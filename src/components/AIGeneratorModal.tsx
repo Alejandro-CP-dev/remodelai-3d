@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { RoomDimensions, Scene, AIGeneration } from '../types';
-import { AIService } from '../services/aiService';
-import { StorageService } from '../services/storage';
+import { useAIGeneration } from '../hooks/useAIGeneration';
 import {
   Sparkles,
   Upload,
@@ -55,25 +54,29 @@ export const AIGeneratorModal: React.FC<AIGeneratorModalProps> = ({
   );
   const [dimensions, setDimensions] = useState<RoomDimensions>(initialDimensions);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [stageMessage, setStageMessage] = useState('');
-  const [abortController, setAbortController] = useState<AbortController | null>(null);
 
   // Failure & edge-case simulation controls for testing TRD compliance
   const [simulateTimeout, setSimulateTimeout] = useState(false);
   const [simulateCriticalError, setSimulateCriticalError] = useState(false);
   const [simulateRecoverableError, setSimulateRecoverableError] = useState(false);
 
-  // Result state
-  const [errorState, setErrorState] = useState<{ type: 'CRITICAL' | 'TIMEOUT' | 'RECOVERABLE'; msg: string } | null>(null);
-  const [pendingScene, setPendingScene] = useState<Scene | null>(null);
-
   // History tab
   const [showHistory, setShowHistory] = useState(false);
   const [historyList, setHistoryList] = useState<AIGeneration[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const {
+    isProcessing,
+    progress,
+    stageMessage,
+    errorState,
+    setErrorState,
+    pendingScene,
+    startGeneration,
+    cancelGeneration,
+    loadHistory: loadHistoryList
+  } = useAIGeneration(projectId, userId);
 
   if (!isOpen) return null;
 
@@ -91,165 +94,27 @@ export const AIGeneratorModal: React.FC<AIGeneratorModalProps> = ({
   };
 
   const handleCancelGeneration = () => {
-    if (abortController) {
-      abortController.abort();
-    }
-    setIsProcessing(false);
-    setProgress(0);
-    setStageMessage('Generación cancelada por el usuario.');
-
-    // Save CANCELLED state to history
-    StorageService.saveAIGeneration({
-      id: `gen-canc-${Date.now()}`,
-      projectId,
-      userId,
-      prompt,
-      roomDimensions: dimensions,
-      status: 'CANCELLED',
-      progressPercent: progress,
-      stageMessage: 'Cancelado por el usuario',
-      provider: 'Gemini 2.5 Flash',
-      model: 'gemini-2.5-flash',
-      startedAt: new Date().toISOString(),
-      durationMs: 4500,
-      createdAt: new Date().toISOString()
-    });
+    cancelGeneration(prompt, dimensions);
   };
 
   const handleStartGeneration = async () => {
-    setIsProcessing(true);
-    setProgress(5);
-    setStageMessage('Encolando petición a la IA...');
-    setErrorState(null);
-    setPendingScene(null);
+    const result = await startGeneration({
+      prompt,
+      dimensions,
+      imageUrl: selectedImage || undefined,
+      simulateTimeout,
+      simulateCriticalError,
+      simulateRecoverableError
+    });
 
-    const controller = new AbortController();
-    setAbortController(controller);
-    const startTime = Date.now();
-
-    try {
-      const result = await AIService.generateRoom({
-        projectId,
-        userId,
-        prompt,
-        dimensions,
-        imageUrl: selectedImage || undefined,
-        shouldSimulateTimeout: simulateTimeout,
-        shouldSimulateCriticalError: simulateCriticalError,
-        shouldSimulateRecoverableError: simulateRecoverableError,
-        abortSignal: controller.signal,
-        onProgress: (pct, msg) => {
-          setProgress(pct);
-          setStageMessage(msg);
-        }
-      });
-
-      const durationMs = Date.now() - startTime;
-
-      if (result.isRecoverableError) {
-        setPendingScene(result.scene);
-        setErrorState({
-          type: 'RECOVERABLE',
-          msg: result.message || 'La IA generó una escena con información incompleta. Puedes revisar y ajustar las dimensiones detectadas.'
-        });
-
-        StorageService.saveAIGeneration({
-          id: `gen-${Date.now()}`,
-          projectId,
-          userId,
-          prompt,
-          roomDimensions: dimensions,
-          status: 'SUCCESS',
-          progressPercent: 100,
-          stageMessage: 'Completado con advertencia de dimensiones',
-          provider: 'Gemini 2.5 Flash',
-          model: 'gemini-2.5-flash',
-          startedAt: new Date(startTime).toISOString(),
-          durationMs,
-          resultScene: result.scene,
-          createdAt: new Date().toISOString()
-        });
-      } else {
-        // Success
-        StorageService.saveAIGeneration({
-          id: `gen-${Date.now()}`,
-          projectId,
-          userId,
-          prompt,
-          roomDimensions: dimensions,
-          status: 'SUCCESS',
-          progressPercent: 100,
-          stageMessage: 'Escena 3D generada exitosamente',
-          provider: 'Gemini 2.5 Flash',
-          model: 'gemini-2.5-flash',
-          startedAt: new Date(startTime).toISOString(),
-          durationMs,
-          resultScene: result.scene,
-          createdAt: new Date().toISOString()
-        });
-
-        onApplyGeneratedScene(result.scene);
-        onClose();
-      }
-    } catch (err: any) {
-      const durationMs = Date.now() - startTime;
-      if (err.message === 'GENERATION_CANCELLED') {
-        return;
-      }
-
-      if (err.message.includes('TIMEOUT')) {
-        setErrorState({
-          type: 'TIMEOUT',
-          msg: 'El procesamiento superó los 60 segundos límite. El servidor no respondió a tiempo.'
-        });
-        StorageService.saveAIGeneration({
-          id: `gen-${Date.now()}`,
-          projectId,
-          userId,
-          prompt,
-          roomDimensions: dimensions,
-          status: 'TIMEOUT',
-          progressPercent: progress,
-          stageMessage: 'Tiempo de espera agotado (60s)',
-          provider: 'Gemini 2.5 Flash',
-          model: 'gemini-2.5-flash',
-          startedAt: new Date(startTime).toISOString(),
-          durationMs,
-          errorCode: 'TIMEOUT_60S',
-          errorMessage: 'Timeout en pipeline de IA',
-          createdAt: new Date().toISOString()
-        });
-      } else {
-        setErrorState({
-          type: 'CRITICAL',
-          msg: 'No fue posible generar el modelo 3D con la información proporcionada. La descripción es ambigua o los datos son inconsistentes.'
-        });
-        StorageService.saveAIGeneration({
-          id: `gen-${Date.now()}`,
-          projectId,
-          userId,
-          prompt,
-          roomDimensions: dimensions,
-          status: 'FAILED',
-          progressPercent: progress,
-          stageMessage: 'Error crítico en generación',
-          provider: 'Gemini 2.5 Flash',
-          model: 'gemini-2.5-flash',
-          startedAt: new Date(startTime).toISOString(),
-          durationMs,
-          errorCode: 'CRITICAL_ERROR',
-          errorMessage: err.message,
-          createdAt: new Date().toISOString()
-        });
-      }
-    } finally {
-      setIsProcessing(false);
+    if (result.success && result.scene) {
+      onApplyGeneratedScene(result.scene);
+      onClose();
     }
   };
 
   const loadHistory = () => {
-    const list = StorageService.getAIGenerations(projectId);
-    setHistoryList(list);
+    setHistoryList(loadHistoryList());
     setShowHistory(true);
   };
 

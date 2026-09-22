@@ -1,5 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
-import { Scene, Object3DItem, RoomDimensions, SceneMaterials } from '../src/types';
+import { Scene, Object3DItem, RoomDimensions, SceneMaterials, User } from '../../src/types';
+import { incrementAIGenerations } from '../repositories/admin.repository';
+import { logAudit } from '../repositories/audit.repository';
 
 export interface GenerateRoomServerRequest {
   projectId: string;
@@ -54,7 +56,7 @@ export class ServerAIService {
     if (ai) {
       try {
         const contents: any[] = [];
-        
+
         // If an image was uploaded as data url or base64
         if (imageUrl && imageUrl.startsWith('data:')) {
           const matches = imageUrl.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
@@ -390,5 +392,40 @@ Genera la escena 3D completa optimizada.`
       updatedAt: new Date().toISOString(),
       objects
     };
+  }
+}
+
+// Orchestrates a generation request with the audit trail/metrics side effects that
+// used to live inline in the /api/ai/generate-room route handler.
+export async function generateRoomAndLog(
+  input: GenerateRoomServerRequest,
+  user?: User | null
+): Promise<GenerateRoomServerResult> {
+  try {
+    const result = await ServerAIService.generateRoom(input);
+    await incrementAIGenerations();
+
+    await logAudit({
+      userId: user?.id || input.userId || 'anon',
+      userName: user?.name || 'Usuario',
+      action: 'ai_generate',
+      entityType: 'generation',
+      entityId: `gen-${Date.now()}`,
+      status: 'SUCCESS',
+      metadata: { model: result.modelUsed, prompt: input.prompt?.substring(0, 50) }
+    });
+
+    return result;
+  } catch (err: any) {
+    await logAudit({
+      userId: user?.id || input.userId || 'anon',
+      userName: user?.name || 'Usuario',
+      action: 'ai_generate',
+      entityType: 'generation',
+      entityId: `gen-err-${Date.now()}`,
+      status: 'FAILED',
+      metadata: { error: err.message }
+    });
+    throw err;
   }
 }
