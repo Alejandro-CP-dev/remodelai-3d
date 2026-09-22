@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { User, AdminMetrics, AuditLog } from '../types';
-import { StorageService } from '../services/storage';
-import { apiClient } from '../services/apiClient';
+import React, { useState } from 'react';
+import { User } from '../types';
+import { useAdminMetrics } from '../hooks/useAdminMetrics';
 import {
   ShieldCheck,
   Users,
@@ -29,43 +28,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   currentUser,
   onBackToApp
 }) => {
-  const [metrics, setMetrics] = useState<AdminMetrics | null>(null);
-  const [logs, setLogs] = useState<AuditLog[]>([]);
+  const { metrics, logs, lastUpdated, isRefreshing, refresh } = useAdminMetrics();
   const [filterAction, setFilterAction] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const fetchMetricsAndLogs = async () => {
-    setIsRefreshing(true);
-    try {
-      const [m, l] = await Promise.all([
-        apiClient.getAdminMetrics(),
-        apiClient.getAuditLogs()
-      ]);
-      setMetrics(m);
-      setLogs(l);
-    } catch {
-      // Offline fallback
-      const m = StorageService.getAdminMetrics();
-      const l = StorageService.getAuditLogs();
-      setMetrics(m);
-      setLogs(l);
-    } finally {
-      setLastUpdated(new Date());
-      setIsRefreshing(false);
-    }
-  };
-
-  // Auto-refresh every 30s as requested in TRD
-  useEffect(() => {
-    fetchMetricsAndLogs();
-    const timer = setInterval(() => {
-      fetchMetricsAndLogs();
-    }, 30000);
-    return () => clearInterval(timer);
-  }, []);
 
   // RBAC Access Control Guard
   if (!currentUser || currentUser.role !== 'admin') {
@@ -134,7 +100,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         <div className="flex items-center gap-2">
           <button
-            onClick={fetchMetricsAndLogs}
+            onClick={refresh}
             disabled={isRefreshing}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium transition-colors"
           >

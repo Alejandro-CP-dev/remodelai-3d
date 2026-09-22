@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Project, CameraPreset, LightingPreset, User } from '../types';
-import { StorageService } from '../services/storage';
-import { apiClient } from '../services/apiClient';
+import { useShareLink } from '../hooks/useShareLink';
 import { SceneCanvas } from './Editor3D/SceneCanvas';
 import { WebGLErrorBoundary } from './WebGLErrorBoundary';
 import { Copy, Eye, ArrowLeft, Sun, Moon, Sunset, Home, ShieldAlert, Sparkles, Loader2 } from 'lucide-react';
@@ -21,6 +20,7 @@ export const SharedViewer: React.FC<SharedViewerProps> = ({
   onBackToHome,
   onRequireAuth
 }) => {
+  const { resolveShare, cloneSharedProject } = useShareLink();
   const [project, setProject] = useState<Project | null>(null);
   const [creatorName, setCreatorName] = useState<string>('');
   const [isRevoked, setIsRevoked] = useState(false);
@@ -33,35 +33,15 @@ export const SharedViewer: React.FC<SharedViewerProps> = ({
     let isMounted = true;
     setIsLoading(true);
 
-    // 1. Try fetching from real server API (enables cross-device sharing)
-    apiClient.getShareByToken(token)
-      .then(res => {
+    resolveShare(token)
+      .then(result => {
         if (!isMounted) return;
-        if (!res || !res.project) {
+        if (!result) {
           setIsRevoked(true);
         } else {
-          setProject(res.project);
-          setCreatorName(res.share.creatorName || res.project.ownerName);
-          setLightingPreset(res.project.scene?.lightingPreset || 'dia');
-        }
-      })
-      .catch(() => {
-        // Fallback to local storage if offline or during local test
-        const share = StorageService.getShareLinkByToken(token);
-        if (!share || !share.isActive) {
-          if (isMounted) setIsRevoked(true);
-          return;
-        }
-        StorageService.logShareAccess(token);
-        const proj = StorageService.getProjectById(share.projectId);
-        if (!proj) {
-          if (isMounted) setIsRevoked(true);
-          return;
-        }
-        if (isMounted) {
-          setProject(proj);
-          setCreatorName(share.creatorName || proj.ownerName);
-          setLightingPreset(proj.scene.lightingPreset || 'dia');
+          setProject(result.project);
+          setCreatorName(result.creatorName);
+          setLightingPreset(result.project.scene?.lightingPreset || 'dia');
         }
       })
       .finally(() => {
@@ -82,13 +62,7 @@ export const SharedViewer: React.FC<SharedViewerProps> = ({
     if (!project) return;
     setIsCloning(true);
     try {
-      // Try backend duplicate first
-      let cloned: Project;
-      try {
-        cloned = await apiClient.duplicateProject(project.id);
-      } catch {
-        cloned = StorageService.duplicateProject(project.id, currentUser.id, currentUser.name);
-      }
+      const cloned = await cloneSharedProject(project.id, currentUser.id, currentUser.name);
       onCloneSuccess(cloned);
     } catch (err) {
       alert('No se pudo clonar el proyecto.');
