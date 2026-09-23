@@ -10,7 +10,8 @@ import {
   LogOut,
   User as UserIcon,
   LogIn,
-  ChevronDown
+  ChevronDown,
+  Settings
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -21,6 +22,7 @@ interface NavbarProps {
   onToggleOnline: () => void;
   onNavigate: (view: 'landing' | 'dashboard' | 'editor' | 'admin') => void;
   onOpenAuth: () => void;
+  onOpenProfile: () => void;
   onLogout: () => void;
   onOpenTestMatrix: () => void;
   onSwitchUser: (email: string) => void;
@@ -34,6 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onToggleOnline,
   onNavigate,
   onOpenAuth,
+  onOpenProfile,
   onLogout,
   onOpenTestMatrix,
   onSwitchUser
@@ -174,6 +177,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                   >
                     <span>Alejandro Carrillo</span>
                     <span className="text-[10px] text-slate-400 font-mono">Usuario</span>
+                  </button>
+                </div>
+
+                <div className="p-1 border-t border-slate-800">
+                  <button
+                    onClick={onOpenProfile}
+                    className="w-full text-left px-2 py-1.5 rounded-lg text-xs text-slate-300 hover:bg-slate-800 flex items-center gap-2"
+                  >
+                    <Settings className="w-3.5 h-3.5" />
+                    Editar perfil
                   </button>
                 </div>
 

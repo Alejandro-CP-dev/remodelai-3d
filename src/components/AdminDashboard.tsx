@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User } from '../types';
 import { useAdminMetrics } from '../hooks/useAdminMetrics';
+import { StorageService } from '../services/storage';
 import {
   ShieldCheck,
   Users,
@@ -16,8 +17,14 @@ import {
   AlertTriangle,
   ArrowLeft,
   Clock,
-  ShieldAlert
+  ShieldAlert,
+  ChevronLeft,
+  ChevronRight,
+  UserCheck,
+  UserX
 } from 'lucide-react';
+
+const LOGS_PER_PAGE = 20;
 
 interface AdminDashboardProps {
   currentUser: User | null;
@@ -32,6 +39,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [filterAction, setFilterAction] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [managedUsers, setManagedUsers] = useState<User[]>(() => StorageService.getUsers());
+  const [userSearchTerm, setUserSearchTerm] = useState<string>('');
+  const [userStatusError, setUserStatusError] = useState<string | null>(null);
+
+  // Reset to first page whenever filters/search change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [filterAction, filterStatus, searchTerm]);
+
+  const handleToggleUserStatus = (user: User) => {
+    setUserStatusError(null);
+    const nextStatus = user.status === 'INACTIVE' ? 'ACTIVE' : 'INACTIVE';
+    try {
+      StorageService.setUserStatus(user.id, nextStatus, currentUser);
+      setManagedUsers(StorageService.getUsers());
+    } catch (err: any) {
+      setUserStatusError(err.message || 'No se pudo actualizar el estado del usuario.');
+    }
+  };
 
   // RBAC Access Control Guard
   if (!currentUser || currentUser.role !== 'admin') {
@@ -66,6 +93,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       JSON.stringify(log.metadata).toLowerCase().includes(searchTerm.toLowerCase());
     return matchesAction && matchesStatus && matchesSearch;
   });
+
+  const filteredUsers = managedUsers.filter(u =>
+    u.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+    u.email.toLowerCase().includes(userSearchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.max(1, Math.ceil(filteredLogs.length / LOGS_PER_PAGE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedLogs = filteredLogs.slice(
+    (safePage - 1) * LOGS_PER_PAGE,
+    safePage * LOGS_PER_PAGE
+  );
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col select-none">
@@ -183,6 +222,115 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </div>
         )}
 
+        {/* User Management Section */}
+        <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
+          <div className="p-5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-100">
+                Gestión de Usuarios
+              </h3>
+              <p className="text-xs text-slate-400">
+                Activa o inactiva cuentas de usuario. Un usuario inactivo no podrá iniciar sesión.
+              </p>
+            </div>
+
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Buscar por nombre o correo..."
+                value={userSearchTerm}
+                onChange={e => setUserSearchTerm(e.target.value)}
+                className="pl-8 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+          </div>
+
+          {userStatusError && (
+            <div className="mx-5 mt-4 p-3 bg-rose-950/50 border border-rose-800/60 rounded-xl text-xs text-rose-300">
+              {userStatusError}
+            </div>
+          )}
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs text-slate-300">
+              <thead className="bg-slate-950/60 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
+                <tr>
+                  <th className="p-3 pl-5">Usuario</th>
+                  <th className="p-3">Correo</th>
+                  <th className="p-3">Rol</th>
+                  <th className="p-3">Estado</th>
+                  <th className="p-3 pr-5 text-right">Acción</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60">
+                {filteredUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center text-slate-500">
+                      No se encontraron usuarios para esta búsqueda.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredUsers.map(u => (
+                    <tr key={u.id} className="hover:bg-slate-800/40 transition-colors">
+                      <td className="p-3 pl-5 font-medium text-slate-200">{u.name}</td>
+                      <td className="p-3 text-slate-400">{u.email}</td>
+                      <td className="p-3">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-950 border border-slate-800 font-mono text-[11px] text-indigo-300 uppercase">
+                          {u.role}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                          u.status === 'ACTIVE' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' :
+                          u.status === 'INACTIVE' ? 'bg-rose-950 text-rose-300 border border-rose-800' :
+                          'bg-amber-950 text-amber-300 border border-amber-800'
+                        }`}>
+                          {u.status === 'ACTIVE' && <CheckCircle2 className="w-3 h-3" />}
+                          {u.status === 'INACTIVE' && <XCircle className="w-3 h-3" />}
+                          {u.status === 'PENDIENTE_VERIFICACION' && <AlertTriangle className="w-3 h-3" />}
+                          {u.status}
+                        </span>
+                      </td>
+                      <td className="p-3 pr-5 text-right">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleUserStatus(u)}
+                          disabled={u.id === currentUser.id || u.role === 'admin'}
+                          title={
+                            u.id === currentUser.id
+                              ? 'No puedes cambiar el estado de tu propia cuenta.'
+                              : u.role === 'admin'
+                              ? 'No se puede inactivar a otro administrador.'
+                              : undefined
+                          }
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold border transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                            u.status === 'INACTIVE'
+                              ? 'bg-emerald-950/50 text-emerald-300 border-emerald-800 hover:bg-emerald-900/50'
+                              : 'bg-rose-950/50 text-rose-300 border-rose-800 hover:bg-rose-900/50'
+                          }`}
+                        >
+                          {u.status === 'INACTIVE' ? (
+                            <>
+                              <UserCheck className="w-3.5 h-3.5" />
+                              Activar
+                            </>
+                          ) : (
+                            <>
+                              <UserX className="w-3.5 h-3.5" />
+                              Inactivar
+                            </>
+                          )}
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         {/* Audit Log Table Section */}
         <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
           <div className="p-5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -221,6 +369,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <option value="export_render">Exportación HD</option>
                 <option value="share_create">Enlace Compartido</option>
                 <option value="project_delete">Eliminación</option>
+                <option value="profile_update">Actualización de Perfil</option>
+                <option value="user_status_change">Cambio de Estado</option>
               </select>
 
               <select
@@ -257,7 +407,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </td>
                   </tr>
                 ) : (
-                  filteredLogs.map(log => (
+                  paginatedLogs.map(log => (
                     <tr key={log.id} className="hover:bg-slate-800/40 transition-colors">
                       <td className="p-3 pl-5 whitespace-nowrap text-slate-400 font-mono text-[11px]">
                         {new Date(log.createdAt).toLocaleString()}
@@ -294,6 +444,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          {filteredLogs.length > 0 && (
+            <div className="flex items-center justify-between px-5 py-3 border-t border-slate-800 text-xs text-slate-400">
+              <span>
+                Mostrando {(safePage - 1) * LOGS_PER_PAGE + 1}–{Math.min(safePage * LOGS_PER_PAGE, filteredLogs.length)} de {filteredLogs.length} registros
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={safePage === 1}
+                  className="p-1.5 rounded-lg border border-slate-800 bg-slate-950 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+                <span className="px-2 font-medium text-slate-300">
+                  Página {safePage} de {totalPages}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={safePage === totalPages}
+                  className="p-1.5 rounded-lg border border-slate-800 bg-slate-950 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>

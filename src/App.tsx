@@ -10,6 +10,7 @@ import { EditorPage } from './components/EditorPage';
 import { SharedViewer } from './components/SharedViewer';
 import { AdminDashboard } from './components/AdminDashboard';
 import { AuthModal } from './components/AuthModal';
+import { ProfileModal } from './components/ProfileModal';
 import { TestMatrixModal } from './components/TestMatrixModal';
 import { AIGeneratorModal } from './components/AIGeneratorModal';
 
@@ -35,6 +36,7 @@ export default function App() {
 
   const [isOnline, setIsOnline] = useState<boolean>(() => StorageService.isNetworkOnline());
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isTestMatrixOpen, setIsTestMatrixOpen] = useState(false);
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
 
@@ -120,6 +122,7 @@ export default function App() {
           onToggleOnline={handleToggleOnline}
           onNavigate={view => setCurrentView(view)}
           onOpenAuth={() => setIsAuthOpen(true)}
+          onOpenProfile={() => setIsProfileOpen(true)}
           onLogout={handleLogout}
           onOpenTestMatrix={() => setIsTestMatrixOpen(true)}
           onSwitchUser={handleSwitchUser}
@@ -214,6 +217,13 @@ export default function App() {
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
         onAuthSuccess={handleAuthSuccess}
+      />
+
+      <ProfileModal
+        isOpen={isProfileOpen}
+        currentUser={currentUser}
+        onClose={() => setIsProfileOpen(false)}
+        onProfileUpdated={setCurrentUser}
       />
 
       <TestMatrixModal
