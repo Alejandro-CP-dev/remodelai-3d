@@ -6,7 +6,7 @@ export interface User {
   email: string;
   role: UserRole;
   emailVerified: boolean;
-  status: 'ACTIVE' | 'PENDIENTE_VERIFICACION';
+  status: 'ACTIVE' | 'PENDIENTE_VERIFICACION' | 'INACTIVE';
   createdAt: string;
   updatedAt: string;
   lastLoginAt?: string;
@@ -166,8 +166,8 @@ export interface AuditLog {
   userId: string;
   userName: string;
   userEmail: string;
-  action: 'login' | 'register' | 'ai_generate' | 'edit_scene' | 'export_render' | 'share_create' | 'share_revoke' | 'project_create' | 'project_delete' | 'error';
-  entityType: 'project' | 'scene' | 'generation' | 'export' | 'share' | 'auth';
+  action: 'login' | 'register' | 'ai_generate' | 'edit_scene' | 'export_render' | 'share_create' | 'share_revoke' | 'project_create' | 'project_delete' | 'profile_update' | 'user_status_change' | 'error';
+  entityType: 'project' | 'scene' | 'generation' | 'export' | 'share' | 'auth' | 'user';
   entityId: string;
   status: 'SUCCESS' | 'FAILED' | 'TIMEOUT';
   metadata: Record<string, unknown>;

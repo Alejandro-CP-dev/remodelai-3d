@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, SubmitEvent } from 'react';
 import { User } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { LogIn, UserPlus, Mail, Lock, User as UserIcon, X, Check, ArrowLeft, KeyRound } from 'lucide-react';
@@ -21,6 +21,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [confirmPassword, setConfirmPassword] = useState('');
   const [verifyCode, setVerifyCode] = useState('');
   const [pendingUserId, setPendingUserId] = useState<string | null>(null);
+  const [verifyOrigin, setVerifyOrigin] = useState<'login' | 'register'>('register');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -28,7 +29,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = (e: SubmitEvent) => {
     e.preventDefault();
     setErrorMessage(null);
 
@@ -44,6 +45,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     try {
       const { user } = register(name, email);
       setPendingUserId(user.id);
+      setVerifyOrigin('register');
       setMode('verify');
       setSuccessMessage('Hemos enviado un enlace y código de verificación a tu correo.');
     } catch (err: any) {
@@ -51,7 +53,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  const handleVerifyEmail = (e: React.FormEvent) => {
+  const handleVerifyEmail = (e: SubmitEvent) => {
     e.preventDefault();
     if (!pendingUserId) return;
     try {
@@ -63,7 +65,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = (e: SubmitEvent) => {
     e.preventDefault();
     setErrorMessage(null);
     try {
@@ -75,10 +77,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         const existing = getUsers().find(u => u.email.toLowerCase() === email.toLowerCase());
         if (existing) {
           setPendingUserId(existing.id);
+          setVerifyOrigin('login');
           setMode('verify');
           setErrorMessage('Tu cuenta aún no está verificada. Por favor ingresa el código o verifica tu correo.');
           return;
         }
+      }
+      if (err.message === 'ACCOUNT_INACTIVE') {
+        setErrorMessage('Tu cuenta ha sido inactivada por un administrador. Contacta a soporte para más información.');
+        return;
       }
       setErrorMessage(err.message || 'Credenciales incorrectas');
     }
@@ -94,8 +101,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         const u = getUsers().find(usr => usr.email === targetEmail);
         if (u) {
           setPendingUserId(u.id);
+          setVerifyOrigin('login');
           setMode('verify');
         }
+      } else if (err.message === 'ACCOUNT_INACTIVE') {
+        setErrorMessage('Esa cuenta ha sido inactivada por un administrador.');
       }
     }
   };
@@ -338,6 +348,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   Reenviar código de verificación
                 </button>
               </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setErrorMessage(null);
+                  setSuccessMessage(null);
+                  setVerifyCode('');
+                  setPendingUserId(null);
+                  setMode(verifyOrigin);
+                }}
+                className="w-full text-xs text-slate-400 hover:text-slate-200 flex items-center justify-center gap-1 pt-1"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                {verifyOrigin === 'register' ? '¿Correo incorrecto? Corregirlo' : 'Volver al login'}
+              </button>
             </form>
           )}
 

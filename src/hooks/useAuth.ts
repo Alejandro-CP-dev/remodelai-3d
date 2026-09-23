@@ -23,6 +23,22 @@ export function useAuth() {
     return user;
   };
 
+  const updateProfile = (userId: string, updates: { name?: string; email?: string; avatarUrl?: string }): User => {
+    const user = StorageService.updateUserProfile(userId, updates);
+    if (currentUser?.id === userId) {
+      setCurrentUser(user);
+    }
+    return user;
+  };
+
+  const setUserStatus = (userId: string, status: 'ACTIVE' | 'INACTIVE'): User => {
+    const user = StorageService.setUserStatus(userId, status, currentUser);
+    if (currentUser?.id === userId && status === 'INACTIVE') {
+      setCurrentUser(null);
+    }
+    return user;
+  };
+
   const loginWithGoogle = (): User => {
     const user = StorageService.loginWithGoogle();
     setCurrentUser(user);
@@ -36,5 +52,5 @@ export function useAuth() {
 
   const getUsers = () => StorageService.getUsers();
 
-  return { currentUser, setCurrentUser, login, register, verifyEmail, loginWithGoogle, logout, getUsers };
+  return { currentUser, setCurrentUser, login, register, verifyEmail, loginWithGoogle, logout, getUsers, updateProfile, setUserStatus };
 }

@@ -362,6 +362,92 @@ export class StorageService {
     return user;
   }
 
+  static updateUserProfile(userId: string, updates: { name?: string; email?: string; avatarUrl?: string }): User {
+    const users = this.getUsers();
+    const user = users.find(u => u.id === userId);
+    if (!user) throw new Error('Usuario no encontrado.');
+
+    if (updates.email && updates.email.toLowerCase() !== user.email.toLowerCase()) {
+      const emailTaken = users.some(u => u.id !== userId && u.email.toLowerCase() === updates.email!.toLowerCase());
+      if (emailTaken) {
+        throw new Error('Ya existe una cuenta registrada con este correo electrónico.');
+      }
+      user.email = updates.email;
+    }
+
+    if (updates.name !== undefined) {
+      if (!updates.name.trim()) {
+        throw new Error('El nombre no puede estar vacío.');
+      }
+      user.name = updates.name.trim();
+    }
+
+    if (updates.avatarUrl !== undefined) {
+      user.avatarUrl = updates.avatarUrl;
+    }
+
+    user.updatedAt = new Date().toISOString();
+    this.setItem(STORAGE_KEYS.USERS, users);
+
+    const current = this.getCurrentUser();
+    if (current?.id === userId) {
+      this.setCurrentUser(user);
+    }
+
+    this.logAudit({
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+      action: 'profile_update',
+      entityType: 'user',
+      entityId: user.id,
+      status: 'SUCCESS',
+      metadata: { updatedFields: Object.keys(updates) }
+    });
+
+    return user;
+  }
+
+  static setUserStatus(userId: string, status: 'ACTIVE' | 'INACTIVE', actingAdmin?: User | null): User {
+    const users = this.getUsers();
+    const user = users.find(u => u.id === userId);
+    if (!user) throw new Error('Usuario no encontrado.');
+
+    if (actingAdmin?.id === userId) {
+      throw new Error('No puedes inactivar tu propia cuenta de administrador.');
+    }
+    if (user.role === 'admin' && status === 'INACTIVE') {
+      throw new Error('No se puede inactivar a otro administrador desde este panel.');
+    }
+
+    user.status = status;
+    user.updatedAt = new Date().toISOString();
+    this.setItem(STORAGE_KEYS.USERS, users);
+
+    // If the affected user is the current session, force logout when deactivated
+    const current = this.getCurrentUser();
+    if (current?.id === userId) {
+      if (status === 'INACTIVE') {
+        this.setCurrentUser(null);
+      } else {
+        this.setCurrentUser(user);
+      }
+    }
+
+    this.logAudit({
+      userId: actingAdmin?.id || 'system',
+      userName: actingAdmin?.name || 'Sistema',
+      userEmail: actingAdmin?.email || '',
+      action: 'user_status_change',
+      entityType: 'user',
+      entityId: user.id,
+      status: 'SUCCESS',
+      metadata: { targetUser: user.email, newStatus: status }
+    });
+
+    return user;
+  }
+
   static login(email: string): User {
     const users = this.getUsers();
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
@@ -381,6 +467,20 @@ export class StorageService {
 
     if (!user.emailVerified) {
       throw new Error('EMAIL_NOT_VERIFIED');
+    }
+
+    if (user.status === 'INACTIVE') {
+      this.logAudit({
+        userId: user.id,
+        userName: user.name,
+        userEmail: user.email,
+        action: 'login',
+        entityType: 'auth',
+        entityId: user.id,
+        status: 'FAILED',
+        metadata: { reason: 'account_inactive' }
+      });
+      throw new Error('ACCOUNT_INACTIVE');
     }
 
     user.lastLoginAt = new Date().toISOString();

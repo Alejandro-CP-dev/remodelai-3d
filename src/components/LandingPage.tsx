@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Sparkles, Layers, Download, Share2, ArrowRight, CheckCircle2, ShieldCheck, Box } from 'lucide-react';
+import { LightingCubesGrid } from './LightingCubesGrid';
 
 interface LandingPageProps {
   onOpenDemo: () => void;
@@ -18,26 +19,33 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col select-none overflow-x-hidden">
       {/* Hero Section */}
       <section className="relative pt-16 pb-20 px-6 max-w-7xl mx-auto w-full flex flex-col items-center text-center">
+        {/* Decorative 3D lighting cubes grid background */}
+        <div className="absolute inset-x-0 top-0 h-[560px] overflow-hidden">
+          <LightingCubesGrid />
+          {/* Fade so the effect blends into the page background instead of a hard edge */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/10 via-slate-950/60 to-slate-950" />
+        </div>
+
         {/* Subtle Pill */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-6">
+        <div className="relative z-10 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-6">
           <Sparkles className="w-3.5 h-3.5" />
           <span>Generación Paramétrica 3D Asistida por IA</span>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-100 max-w-4xl leading-tight">
+        <h1 className="relative z-10 text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-100 max-w-4xl leading-tight">
           Visualiza la remodelación de tu habitación{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-400 to-amber-300">
             antes de ejecutarla en la realidad
           </span>
         </h1>
 
-        <p className="mt-6 text-base sm:text-lg text-slate-400 max-w-2xl leading-relaxed">
+        <p className="relative z-10 mt-6 text-base sm:text-lg text-slate-400 max-w-2xl leading-relaxed">
           Convierte fotos y descripciones en lenguaje natural en escenas 3D WebGL interactivas.
           Distribuye mobiliario con precisión métrica, exporta renders en 4K y comparte con tus clientes.
         </p>
 
         {/* CTAs */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
+        <div className="relative z-10 mt-8 flex flex-col sm:flex-row items-center gap-4">
           <button
             onClick={onOpenDemo}
             className="w-full sm:w-auto px-7 py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl text-sm font-semibold shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
@@ -56,7 +64,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         {/* Interactive Before / After Showcase */}
-        <div className="mt-14 w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-3xl p-3 sm:p-5 shadow-2xl overflow-hidden">
+        <div className="relative z-10 mt-14 w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-3xl p-3 sm:p-5 shadow-2xl overflow-hidden">
           <div className="relative aspect-video rounded-2xl overflow-hidden select-none">
             {/* After Image (Full background) */}
             <img
