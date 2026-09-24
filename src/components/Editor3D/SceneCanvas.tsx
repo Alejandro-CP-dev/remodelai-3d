@@ -10,7 +10,10 @@ interface SceneCanvasProps {
   lightingPreset: LightingPreset;
   cameraPreset: CameraPreset;
   isReadOnly?: boolean;
-  onCanvasReady?: (exportFn: (format: 'PNG' | 'JPG' | 'WEBP', resolution: '1080p' | '2K' | '4K') => Promise<string>) => void;
+  onCanvasReady?: (
+    exportFn: (format: 'PNG' | 'JPG' | 'WEBP', resolution: '1080p' | '2K' | '4K') => Promise<string>,
+    captureThumbnail: () => string
+  ) => void;
 }
 
 export const SceneCanvas: React.FC<SceneCanvasProps> = ({
@@ -733,6 +736,12 @@ export const SceneCanvas: React.FC<SceneCanvasProps> = ({
         r.setSize(container.clientWidth || 800, container.clientHeight || 550);
 
         return dataUrl;
+      }, () => {
+        // Lightweight dashboard-card thumbnail: reuse whatever is already on
+        // screen at preview resolution (no resize, no extra render pass) so
+        // this can run silently on every autosave without any visible flicker.
+        if (!threeRef.current) return '';
+        return threeRef.current.renderer.domElement.toDataURL('image/jpeg', 0.7);
       });
     }
 
