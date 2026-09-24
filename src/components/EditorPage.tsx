@@ -59,6 +59,7 @@ export const EditorPage: React.FC<EditorPageProps> = ({
     renameProject,
     applyGeneratedScene,
     exportFnRef,
+    thumbnailFnRef,
     exportRender
   } = useEditorScene(project, currentUser, onUpdateProject);
 
@@ -106,8 +107,9 @@ export const EditorPage: React.FC<EditorPageProps> = ({
               onSelectObject={setSelectedObjectId}
               lightingPreset={lightingPreset}
               cameraPreset={cameraPreset}
-              onCanvasReady={fn => {
-                exportFnRef.current = fn;
+              onCanvasReady={(exportFn, captureThumbnail) => {
+                exportFnRef.current = exportFn;
+                thumbnailFnRef.current = captureThumbnail;
               }}
             />
           </WebGLErrorBoundary>

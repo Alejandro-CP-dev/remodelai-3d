@@ -32,6 +32,17 @@ export function useEditorScene(project: Project, currentUser: User | null, onUpd
 
   // Export render callback from Three.js canvas
   const exportFnRef = useRef<((format: ExportFormat, resolution: ExportResolution) => Promise<string>) | null>(null);
+  // Lightweight dashboard-card thumbnail capture from the same canvas
+  const thumbnailFnRef = useRef<(() => string) | null>(null);
+
+  const captureThumbnail = (): string | undefined => {
+    try {
+      const dataUrl = thumbnailFnRef.current?.();
+      return dataUrl || undefined;
+    } catch {
+      return undefined;
+    }
+  };
 
   // Sync scene when external project changes
   useEffect(() => {
@@ -64,6 +75,7 @@ export function useEditorScene(project: Project, currentUser: User | null, onUpd
         const updatedProject: Project = {
           ...project,
           scene: newScene,
+          thumbnailUrl: captureThumbnail() || project.thumbnailUrl,
           updatedAt: new Date().toISOString(),
           version: (project.version || 1) + 1
         };
@@ -99,6 +111,7 @@ export function useEditorScene(project: Project, currentUser: User | null, onUpd
       const updatedProject: Project = {
         ...project,
         scene,
+        thumbnailUrl: captureThumbnail() || project.thumbnailUrl,
         updatedAt: new Date().toISOString(),
         version: (project.version || 1) + 1
       };
@@ -347,6 +360,7 @@ export function useEditorScene(project: Project, currentUser: User | null, onUpd
     renameProject,
     applyGeneratedScene,
     exportFnRef,
+    thumbnailFnRef,
     exportRender
   };
 }
